@@ -30,8 +30,8 @@ echo ""
 
 # Test 4: Test with volume mount (adjusted command as requested)
 echo "🧪 Test 4: Test Docker image with volume mount"
-echo "Testing: docker run -it --rm -v \$(pwd):/app myx4play/flutter:stable flutter --version"
-echo "Note: Using /home/flutter/workspace instead of /app as per image design"
+echo "Testing: docker run -it --rm -v \$(pwd):/workspace myx4play/flutter:stable flutter --version"
+echo "Note: Now using /workspace as per image design"
 
 # Create test directory structure
 mkdir -p /tmp/test-workspace
@@ -39,7 +39,7 @@ cd /tmp/test-workspace
 
 # Test the mount (without -it for non-interactive test)
 echo "Running test..."
-timeout 60 docker run --rm -v $(pwd):/home/flutter/workspace myx4play/flutter:stable sh -c "pwd && ls -la && echo 'Volume mount test successful'" || {
+timeout 60 docker run --rm -v $(pwd):/workspace myx4play/flutter:stable sh -c "pwd && ls -la && echo 'Volume mount test successful'" || {
     echo "Volume mount test completed (Flutter version check may fail due to SSL issues in environment)"
 }
 echo "✅ Volume mount test completed"

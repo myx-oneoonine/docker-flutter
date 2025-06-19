@@ -54,7 +54,7 @@ jobs:
         docker run --rm ${{ env.DOCKER_IMAGE }}:${{ env.FLUTTER_VERSION }} flutter --version
         
         echo "Testing workspace volume mount..."
-        docker run --rm -v $(pwd):/home/flutter/workspace ${{ env.DOCKER_IMAGE }}:${{ env.FLUTTER_VERSION }} sh -c "cd /home/flutter/workspace && pwd && ls -la"
+        docker run --rm -v $(pwd):/workspace ${{ env.DOCKER_IMAGE }}:${{ env.FLUTTER_VERSION }} sh -c "cd /workspace && pwd && ls -la"
         
         echo "Verifying Flutter functionality..."
         docker run --rm ${{ env.DOCKER_IMAGE }}:${{ env.FLUTTER_VERSION }} flutter doctor --verbose

@@ -62,7 +62,7 @@ docker run -it --rm flutter-dev bash
 docker run --rm flutter-dev flutter --version
 
 # Create new Flutter project
-docker run --rm -v $(pwd):/home/flutter/workspace flutter-dev flutter create my_app
+docker run --rm -v $(pwd):/workspace flutter-dev flutter create my_app
 
 # Run Flutter doctor
 docker run --rm flutter-dev flutter doctor
@@ -72,13 +72,13 @@ docker run --rm flutter-dev flutter doctor
 
 ```bash
 # Mount your project and run make commands
-docker run --rm -v $(pwd):/home/flutter/workspace flutter-dev make gen_all
+docker run --rm -v $(pwd):/workspace flutter-dev make gen_all
 
 # For projects in subdirectories
-docker run --rm -v $(pwd):/home/flutter/workspace flutter-dev sh -c "cd tdac && make gen_all"
+docker run --rm -v $(pwd):/workspace flutter-dev sh -c "cd tdac && make gen_all"
 
 # Interactive make development
-docker run -it --rm -v $(pwd):/home/flutter/workspace flutter-dev bash
+docker run -it --rm -v $(pwd):/workspace flutter-dev bash
 # Inside container: cd your-project && make your-target
 ```
 
@@ -87,19 +87,19 @@ docker run -it --rm -v $(pwd):/home/flutter/workspace flutter-dev bash
 ```bash
 # Mount your Flutter project and work interactively
 docker run -it --rm \
-  -v $(pwd):/home/flutter/workspace \
-  -w /home/flutter/workspace \
+  -v $(pwd):/workspace \
+  -w /workspace \
   flutter-dev bash
 
 # Run specific Flutter commands on your mounted project
 docker run --rm \
-  -v $(pwd):/home/flutter/workspace \
-  -w /home/flutter/workspace \
+  -v $(pwd):/workspace \
+  -w /workspace \
   flutter-dev flutter pub get
 
 docker run --rm \
-  -v $(pwd):/home/flutter/workspace \
-  -w /home/flutter/workspace \
+  -v $(pwd):/workspace \
+  -w /workspace \
   flutter-dev flutter test
 ```
 
@@ -145,15 +145,15 @@ jobs:
     - name: Run Flutter tests
       run: |
         docker run --rm \
-          -v ${{ github.workspace }}:/home/flutter/workspace \
-          -w /home/flutter/workspace \
+          -v ${{ github.workspace }}:/workspace \
+          -w /workspace \
           flutter-dev flutter test
     
     - name: Build Flutter app
       run: |
         docker run --rm \
-          -v ${{ github.workspace }}:/home/flutter/workspace \
-          -w /home/flutter/workspace \
+          -v ${{ github.workspace }}:/workspace \
+          -w /workspace \
           flutter-dev flutter build web
 ```
 
@@ -185,8 +185,8 @@ jobs:
     - name: Run tests with Flutter ${{ matrix.flutter-version }}
       run: |
         docker run --rm \
-          -v ${{ github.workspace }}:/home/flutter/workspace \
-          -w /home/flutter/workspace \
+          -v ${{ github.workspace }}:/workspace \
+          -w /workspace \
           flutter-dev:${{ matrix.flutter-version }} flutter test
 ```
 
@@ -230,8 +230,8 @@ The following environment variables are available in the container:
 
 ## Volumes and Working Directory
 
-- **Default working directory**: `/home/flutter/workspace`
-- **Recommended mount point**: `/home/flutter/workspace`
+- **Default working directory**: `/workspace`
+- **Recommended mount point**: `/workspace`
 - **User**: `flutter` (non-root user with sudo access)
 
 ## Troubleshooting
@@ -246,7 +246,7 @@ If you encounter permission issues when mounting volumes, use one of these solut
 echo "Your UID: $(id -u), GID: $(id -g)"
 
 # Run with matching user ID
-docker run --rm -v $(pwd):/home/flutter/workspace \
+docker run --rm -v $(pwd):/workspace \
   --user $(id -u):$(id -g) \
   flutter-dev-test flutter pub get
 ```
@@ -257,14 +257,14 @@ docker run --rm -v $(pwd):/home/flutter/workspace \
 sudo chown -R 1000:1000 your-project-directory
 
 # Then run normally
-docker run --rm -v $(pwd):/home/flutter/workspace \
+docker run --rm -v $(pwd):/workspace \
   flutter-dev-test flutter pub get
 ```
 
 **Option 3: Create the project from within the container**
 ```bash
 # Create a new Flutter project
-docker run --rm -v $(pwd):/home/flutter/workspace \
+docker run --rm -v $(pwd):/workspace \
   --user $(id -u):$(id -g) \
   flutter-dev-test flutter create my_app
 ```
@@ -287,7 +287,7 @@ docker run --rm flutter-dev fvm flutter doctor -v
 docker run --rm flutter-dev which make
 
 # Run make with verbose output
-docker run --rm -v $(pwd):/home/flutter/workspace flutter-dev make -n your-target
+docker run --rm -v $(pwd):/workspace flutter-dev make -n your-target
 ```
 
 ## Building Custom Images

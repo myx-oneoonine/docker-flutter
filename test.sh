@@ -52,7 +52,7 @@ test:
 	@echo "Test target works"
 EOF
 
-docker run --rm -v /tmp/docker-flutter-test:/home/flutter/workspace flutter-dev-test make gen_all
+docker run --rm -v /tmp/docker-flutter-test:/workspace flutter-dev-test make gen_all
 echo "✅ Test 5 passed"
 echo ""
 
@@ -65,20 +65,20 @@ gen_all:
 	@echo "Current directory: $(PWD)"
 EOF
 
-docker run --rm -v /tmp/docker-flutter-test:/home/flutter/workspace flutter-dev-test sh -c "cd subdir && make gen_all"
+docker run --rm -v /tmp/docker-flutter-test:/workspace flutter-dev-test sh -c "cd subdir && make gen_all"
 echo "✅ Test 6 passed"
 echo ""
 
 # Test 7: Flutter project creation with proper permissions
 echo "🧪 Test 7: Flutter project creation"
 sudo chown -R 1000:1000 /tmp/docker-flutter-test 2>/dev/null || true
-docker run --rm -v /tmp/docker-flutter-test:/home/flutter/workspace flutter-dev-test flutter create demo_app
+docker run --rm -v /tmp/docker-flutter-test:/workspace flutter-dev-test flutter create demo_app
 echo "✅ Test 7 passed"
 echo ""
 
 # Test 8: Flutter commands on created project
 echo "🧪 Test 8: Flutter pub get on created project"
-docker run --rm -v /tmp/docker-flutter-test:/home/flutter/workspace flutter-dev-test sh -c "cd demo_app && flutter pub get"
+docker run --rm -v /tmp/docker-flutter-test:/workspace flutter-dev-test sh -c "cd demo_app && flutter pub get"
 echo "✅ Test 8 passed"
 echo ""
 

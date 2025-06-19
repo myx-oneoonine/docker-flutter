@@ -45,10 +45,10 @@ jobs:
     - name: Test Docker Image
       run: |
         echo "Testing Flutter installation in built image..."
-        docker run --rm -v $(pwd):/home/flutter/workspace ${{ env.DOCKER_IMAGE }}:${{ env.FLUTTER_VERSION }} sh -c "pwd && echo 'Image test successful'"
+        docker run --rm -v $(pwd):/workspace ${{ env.DOCKER_IMAGE }}:${{ env.FLUTTER_VERSION }} sh -c "pwd && echo 'Image test successful'"
         
         echo "Testing volume mount and basic functionality..."
-        docker run --rm -v $(pwd):/home/flutter/workspace ${{ env.DOCKER_IMAGE }}:${{ env.FLUTTER_VERSION }} sh -c "ls -la && whoami"
+        docker run --rm -v $(pwd):/workspace ${{ env.DOCKER_IMAGE }}:${{ env.FLUTTER_VERSION }} sh -c "ls -la && whoami"
     
     - name: Push to DockerHub
       run: |
