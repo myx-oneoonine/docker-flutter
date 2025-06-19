@@ -1,0 +1,66 @@
+name: Build and Push Flutter Docker Image to DockerHub
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      flutter_version:
+        description: 'Flutter version to build'
+        required: false
+        default: 'stable'
+
+env:
+  FLUTTER_VERSION: ${{ github.event.inputs.flutter_version || 'stable' }}
+  DOCKER_IMAGE: myx4play/flutter
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Login to DockerHub
+      uses: docker/login-action@v3
+      with:
+        username: myx4play
+        password: ${{ secrets.DOCKER_SECRET }}
+    
+    - name: Build Docker Image
+      run: |
+        docker buildx build \
+          --build-arg FLUTTER_VERSION=${{ env.FLUTTER_VERSION }} \
+          --load \
+          -t ${{ env.DOCKER_IMAGE }}:${{ env.FLUTTER_VERSION }} \
+          -t ${{ env.DOCKER_IMAGE }}:latest \
+          .
+    
+    - name: Test Docker Image
+      run: |
+        echo "Testing Flutter installation in built image..."
+        docker run --rm -v $(pwd):/home/flutter/workspace ${{ env.DOCKER_IMAGE }}:${{ env.FLUTTER_VERSION }} sh -c "pwd && echo 'Image test successful'"
+        
+        echo "Testing volume mount and basic functionality..."
+        docker run --rm -v $(pwd):/home/flutter/workspace ${{ env.DOCKER_IMAGE }}:${{ env.FLUTTER_VERSION }} sh -c "ls -la && whoami"
+    
+    - name: Push to DockerHub
+      run: |
+        echo "Pushing ${{ env.DOCKER_IMAGE }}:${{ env.FLUTTER_VERSION }}..."
+        docker push ${{ env.DOCKER_IMAGE }}:${{ env.FLUTTER_VERSION }}
+        
+        echo "Pushing ${{ env.DOCKER_IMAGE }}:latest..."
+        docker push ${{ env.DOCKER_IMAGE }}:latest
+    
+    - name: Image Info
+      run: |
+        echo "Successfully built and pushed:"
+        echo "- ${{ env.DOCKER_IMAGE }}:${{ env.FLUTTER_VERSION }}"
+        echo "- ${{ env.DOCKER_IMAGE }}:latest"
+        docker images ${{ env.DOCKER_IMAGE }}

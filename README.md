@@ -332,6 +332,41 @@ The test script validates:
 - Project creation and dependency management
 - Build arguments and multi-platform support
 
+## DockerHub Pipeline
+
+This repository includes an automated CI/CD pipeline that builds and pushes Docker images to DockerHub.
+
+### Pipeline Features
+
+- Automated builds on push to main branch
+- Manual workflow dispatch with configurable Flutter version
+- Docker login with credentials from GitHub secrets
+- Multi-tag support (version-specific and latest)
+- Image testing with volume mounts
+- Automated push to DockerHub registry
+
+### Setup
+
+1. Add `DOCKER_SECRET` to your GitHub repository secrets with your DockerHub password
+2. The pipeline will automatically build and push images tagged as:
+   - `myx4play/flutter:stable` (or specified version)
+   - `myx4play/flutter:latest`
+
+### Manual Trigger
+
+You can manually trigger the pipeline with a specific Flutter version:
+
+1. Go to Actions → Build and Push Flutter Docker Image to DockerHub
+2. Click "Run workflow"
+3. Enter the desired Flutter version (default: stable)
+
+### Testing Pipeline Locally
+
+```bash
+# Test all pipeline steps locally
+./test-pipeline.sh
+```
+
 ## License
 
 This project is open source and available under the [MIT License](LICENSE).

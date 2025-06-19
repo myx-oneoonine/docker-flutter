@@ -38,10 +38,13 @@ RUN useradd -m -s /bin/bash flutter && \
 ENV GIT_SSL_NO_VERIFY=1
 ENV FLUTTER_STORAGE_BASE_URL=https://storage.googleapis.com
 
-# Install Flutter directly using git with shallow clone for faster download
+# Install Flutter directly using git 
 RUN cd /opt && \
     git config --global http.sslverify false && \
-    git clone https://github.com/flutter/flutter.git -b stable --depth 1 && \
+    git clone https://github.com/flutter/flutter.git && \
+    cd flutter && \
+    (git checkout ${FLUTTER_VERSION} || git checkout tags/${FLUTTER_VERSION} || git checkout stable) && \
+    cd .. && \
     chown -R flutter:flutter /opt/flutter && \
     git config --global --add safe.directory /opt/flutter
 
@@ -53,16 +56,24 @@ WORKDIR /home/flutter
 ENV PATH="/opt/flutter/bin:/opt/flutter/bin/cache/dart-sdk/bin:${PATH}"
 ENV FLUTTER_ROOT="/opt/flutter"
 ENV PUB_CACHE="/home/flutter/.pub-cache"
+ENV FLUTTER_NO_ANALYTICS=1
+ENV FLUTTER_SUPPRESS_ANALYTICS_REPORTING=1
 
 # Configure git for flutter user
 RUN git config --global http.sslverify false && \
     git config --global --add safe.directory /opt/flutter
 
 # Configure curl to ignore SSL issues (for Flutter downloads)
-RUN echo 'insecure' > ~/.curlrc
+RUN echo 'insecure' > ~/.curlrc && \
+    echo '--insecure' > ~/.curlrc && \
+    mkdir -p ~/.config/configstore && \
+    echo '{"optOut": true, "lastUpdateNotification": 1500000000000}' > ~/.config/configstore/update-notifier-flutter-tools.json
 
-# Download Dart SDK and configure Flutter - simplified approach
-RUN /opt/flutter/bin/flutter --version || true
+# Download Dart SDK and configure Flutter - pre-cache during build
+RUN cd /opt/flutter && \
+    ./bin/flutter config --no-analytics && \
+    ./bin/flutter doctor || true && \
+    ./bin/flutter --version || true
 
 # Install FVM for version management (if needed)
 RUN /opt/flutter/bin/flutter pub global activate fvm || true
