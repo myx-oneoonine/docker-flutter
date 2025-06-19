@@ -12,6 +12,23 @@ A comprehensive Docker environment for Flutter development with FVM (Flutter Ver
 - ✅ Direct Flutter command execution
 - ✅ GitHub Actions compatibility
 - ✅ Multi-platform support (linux/amd64, linux/arm64)
+- ✅ **Support script (Bob)** - Helper tool for development workflows
+
+## Support Script
+
+This repository includes a comprehensive support script (`support.sh`) nicknamed "Bob" that simplifies Docker Flutter development workflows:
+
+```bash
+# Quick start
+./support.sh init          # Initialize environment
+./support.sh shell         # Interactive shell
+./support.sh flutter --version  # Run Flutter commands
+
+# See all available commands
+./support.sh
+```
+
+For detailed documentation, see [SUPPORT.md](SUPPORT.md).
 
 ## Building the Image
 
