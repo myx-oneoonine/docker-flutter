@@ -48,9 +48,6 @@ RUN cd /opt && \
     chown -R flutter:flutter /opt/flutter && \
     git config --global --add safe.directory /opt/flutter
 
-# Create workspace directory with proper ownership
-RUN mkdir -p /workspace && chown flutter:flutter /workspace
-
 # Switch to flutter user
 USER flutter
 WORKDIR /home/flutter
@@ -84,8 +81,9 @@ RUN /opt/flutter/bin/flutter pub global activate fvm || true
 # Update PATH to include pub cache for FVM
 ENV PATH="/home/flutter/.pub-cache/bin:${PATH}"
 
-# Set working directory to the new workspace
-WORKDIR /workspace
+# Create workspace directory
+RUN mkdir -p /home/flutter/workspace
+WORKDIR /home/flutter/workspace
 
 # Set default command
 CMD ["/bin/bash"]
