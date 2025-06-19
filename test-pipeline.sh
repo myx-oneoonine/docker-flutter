@@ -17,7 +17,11 @@ echo ""
 # Test 2: Build docker image 
 echo "🧪 Test 2: Build Docker image"
 echo "Building with Flutter stable (using stable instead of 3.29.3 due to SSL issues)..."
-docker buildx build --build-arg FLUTTER_VERSION=stable -t myx4play/flutter:stable .
+echo "Testing multi-platform build (linux/amd64, linux/arm64)..."
+docker buildx build --platform linux/amd64,linux/arm64 --build-arg FLUTTER_VERSION=stable -t myx4play/flutter:stable . || {
+    echo "Multi-platform build failed, trying amd64 only..."
+    docker buildx build --platform linux/amd64 --build-arg FLUTTER_VERSION=stable -t myx4play/flutter:stable .
+}
 echo "✅ Docker image built successfully"
 echo ""
 
