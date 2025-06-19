@@ -1,0 +1,78 @@
+name: Manual Flutter Build and Push
+
+on:
+  workflow_dispatch:
+    inputs:
+      flutter_version:
+        description: 'Flutter version to build (e.g., stable, beta, 3.24.0, 3.22.0)'
+        required: true
+        default: 'stable'
+        type: string
+
+env:
+  FLUTTER_VERSION: ${{ github.event.inputs.flutter_version }}
+  DOCKER_IMAGE: myx4play/flutter
+
+jobs:
+  manual-build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Validate Flutter version input
+      run: |
+        echo "Building Flutter version: ${{ env.FLUTTER_VERSION }}"
+        if [ -z "${{ env.FLUTTER_VERSION }}" ]; then
+          echo "Error: Flutter version is required"
+          exit 1
+        fi
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Login to DockerHub
+      uses: docker/login-action@v3
+      with:
+        username: myx4play
+        password: ${{ secrets.DOCKER_SECRET }}
+    
+    - name: Build Docker Image with Custom Flutter Version
+      run: |
+        echo "Building Docker image with Flutter version: ${{ env.FLUTTER_VERSION }}"
+        docker buildx build \
+          --build-arg FLUTTER_VERSION=${{ env.FLUTTER_VERSION }} \
+          --load \
+          -t ${{ env.DOCKER_IMAGE }}:${{ env.FLUTTER_VERSION }} \
+          -t ${{ env.DOCKER_IMAGE }}:manual-${{ env.FLUTTER_VERSION }} \
+          .
+    
+    - name: Test Custom Flutter Build
+      run: |
+        echo "Testing Flutter ${{ env.FLUTTER_VERSION }} installation..."
+        docker run --rm ${{ env.DOCKER_IMAGE }}:${{ env.FLUTTER_VERSION }} flutter --version
+        
+        echo "Testing workspace volume mount..."
+        docker run --rm -v $(pwd):/home/flutter/workspace ${{ env.DOCKER_IMAGE }}:${{ env.FLUTTER_VERSION }} sh -c "cd /home/flutter/workspace && pwd && ls -la"
+        
+        echo "Verifying Flutter functionality..."
+        docker run --rm ${{ env.DOCKER_IMAGE }}:${{ env.FLUTTER_VERSION }} flutter doctor --verbose
+    
+    - name: Push Custom Flutter Version to DockerHub
+      run: |
+        echo "Pushing custom Flutter version: ${{ env.FLUTTER_VERSION }}"
+        docker push ${{ env.DOCKER_IMAGE }}:${{ env.FLUTTER_VERSION }}
+        docker push ${{ env.DOCKER_IMAGE }}:manual-${{ env.FLUTTER_VERSION }}
+        
+        echo "Successfully pushed:"
+        echo "- ${{ env.DOCKER_IMAGE }}:${{ env.FLUTTER_VERSION }}"
+        echo "- ${{ env.DOCKER_IMAGE }}:manual-${{ env.FLUTTER_VERSION }}"
+    
+    - name: Build Summary
+      run: |
+        echo "=== Manual Build Summary ==="
+        echo "Flutter Version: ${{ env.FLUTTER_VERSION }}"
+        echo "Docker Images Built:"
+        docker images ${{ env.DOCKER_IMAGE }} --format "table {{.Repository}}:{{.Tag}}\t{{.Size}}\t{{.CreatedAt}}"
+        echo "==========================="
