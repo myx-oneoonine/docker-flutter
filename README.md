@@ -332,33 +332,50 @@ The test script validates:
 - Project creation and dependency management
 - Build arguments and multi-platform support
 
-## DockerHub Pipeline
+## DockerHub Pipelines
 
-This repository includes an automated CI/CD pipeline that builds and pushes Docker images to DockerHub.
+This repository includes two automated CI/CD pipelines that build and push Docker images to DockerHub.
 
-### Pipeline Features
+### 1. Automated Pipeline (dockerhub-pipeline.yml)
 
-- Automated builds on push to main branch
+**Features:**
+- Automated builds on push to main branch and pull requests
 - Manual workflow dispatch with configurable Flutter version
 - Docker login with credentials from GitHub secrets
 - Multi-tag support (version-specific and latest)
 - Image testing with volume mounts
 - Automated push to DockerHub registry
 
+### 2. Manual Flutter Build Pipeline (manual-flutter-build.yml)
+
+**Features:**
+- Dedicated manual-only workflow for custom Flutter versions
+- Required Flutter version input with validation
+- Enhanced testing including `flutter doctor` verification
+- Dual tagging: version-specific and manual-prefixed tags
+- Detailed build summary and reporting
+
 ### Setup
 
 1. Add `DOCKER_SECRET` to your GitHub repository secrets with your DockerHub password
-2. The pipeline will automatically build and push images tagged as:
+2. The automated pipeline will build and push images tagged as:
    - `myx4play/flutter:stable` (or specified version)
    - `myx4play/flutter:latest`
+3. The manual pipeline will build and push images tagged as:
+   - `myx4play/flutter:{version}` (e.g., `myx4play/flutter:3.24.0`)
+   - `myx4play/flutter:manual-{version}` (e.g., `myx4play/flutter:manual-3.24.0`)
 
-### Manual Trigger
+### Manual Triggers
 
-You can manually trigger the pipeline with a specific Flutter version:
-
-1. Go to Actions → Build and Push Flutter Docker Image to DockerHub
+**Automated Pipeline:**
+1. Go to Actions → "Build and Push Flutter Docker Image to DockerHub"
 2. Click "Run workflow"
 3. Enter the desired Flutter version (default: stable)
+
+**Manual Build Pipeline:**
+1. Go to Actions → "Manual Flutter Build and Push"
+2. Click "Run workflow"
+3. Enter the required Flutter version (e.g., stable, beta, 3.24.0, 3.22.0)
 
 ### Testing Pipeline Locally
 
