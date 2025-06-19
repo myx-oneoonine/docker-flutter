@@ -8,7 +8,6 @@ RUN apt-get update && apt-get install -y \
     git \
     wget \
     unzip \
-    lib32stdc++6 \
     libglu1-mesa \
     default-jdk \
     build-essential \
@@ -27,6 +26,11 @@ RUN apt-get update && apt-get install -y \
     xz-utils \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+# Install lib32stdc++6 only on amd64 platforms (32-bit compatibility library)
+RUN if [ "$(dpkg --print-architecture)" = "amd64" ]; then \
+        apt-get update && apt-get install -y lib32stdc++6 && apt-get clean && rm -rf /var/lib/apt/lists/*; \
+    fi
 
 # Create flutter user
 RUN useradd -m -s /bin/bash flutter && \
