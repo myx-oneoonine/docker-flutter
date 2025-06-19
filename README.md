@@ -238,13 +238,35 @@ The following environment variables are available in the container:
 
 ### Permission Issues
 
-If you encounter permission issues when mounting volumes:
+If you encounter permission issues when mounting volumes, use one of these solutions:
 
+**Option 1: Match user IDs (Recommended)**
 ```bash
-# On Linux/macOS, ensure your files have proper permissions
+# Check your user ID
+echo "Your UID: $(id -u), GID: $(id -g)"
+
+# Run with matching user ID
 docker run --rm -v $(pwd):/home/flutter/workspace \
   --user $(id -u):$(id -g) \
-  flutter-dev flutter pub get
+  flutter-dev-test flutter pub get
+```
+
+**Option 2: Use with proper ownership**
+```bash
+# Change ownership of your project directory
+sudo chown -R 1000:1000 your-project-directory
+
+# Then run normally
+docker run --rm -v $(pwd):/home/flutter/workspace \
+  flutter-dev-test flutter pub get
+```
+
+**Option 3: Create the project from within the container**
+```bash
+# Create a new Flutter project
+docker run --rm -v $(pwd):/home/flutter/workspace \
+  --user $(id -u):$(id -g) \
+  flutter-dev-test flutter create my_app
 ```
 
 ### FVM Issues
@@ -292,6 +314,23 @@ ENV YOUR_PROJECT_VAR=value
 
 - `linux/amd64`
 - `linux/arm64`
+
+## Testing
+
+This repository includes a comprehensive test script that validates all documented examples:
+
+```bash
+# Run all tests to verify functionality
+./test.sh
+```
+
+The test script validates:
+- Flutter installation and version checking
+- Makefile execution support
+- FVM installation and activation
+- Volume mounting and permissions
+- Project creation and dependency management
+- Build arguments and multi-platform support
 
 ## License
 

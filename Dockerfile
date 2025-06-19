@@ -42,7 +42,8 @@ ENV FLUTTER_STORAGE_BASE_URL=https://storage.googleapis.com
 RUN cd /opt && \
     git config --global http.sslverify false && \
     git clone https://github.com/flutter/flutter.git -b stable --depth 1 && \
-    chown -R flutter:flutter /opt/flutter
+    chown -R flutter:flutter /opt/flutter && \
+    git config --global --add safe.directory /opt/flutter
 
 # Switch to flutter user
 USER flutter
@@ -54,7 +55,8 @@ ENV FLUTTER_ROOT="/opt/flutter"
 ENV PUB_CACHE="/home/flutter/.pub-cache"
 
 # Configure git for flutter user
-RUN git config --global http.sslverify false
+RUN git config --global http.sslverify false && \
+    git config --global --add safe.directory /opt/flutter
 
 # Configure curl to ignore SSL issues (for Flutter downloads)
 RUN echo 'insecure' > ~/.curlrc
